@@ -50,13 +50,14 @@ pub async fn get_safe_block(
         let rpc_clone = rpc_list.read().unwrap()[i].clone();
         let tx = tx.clone(); // Clone the sender for this RPC
 
+
         // Spawn a future for each RPC
         let rpc_future = async move {
             let a = rpc_clone.get_finalized_block();
             let result = timeout(Duration::from_millis(ttl), a).await;
 
             let reported_finalized = match result {
-                Ok(response) => response.unwrap(), // Handle timeout as 0
+                Ok(response) => response.unwrap_or_default(), // Handle timeout as 0
                 Err(_) => 0,                       // Handle timeout as 0
             };
 
